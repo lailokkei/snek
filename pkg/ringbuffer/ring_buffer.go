@@ -2,7 +2,6 @@ package ringbuffer
 
 import (
 	"errors"
-	"log"
 )
 
 type RingBuffer[T any] struct {
@@ -36,7 +35,6 @@ func (r *RingBuffer[T]) Push(value T) error {
 	r.buffer[r.tail] = value
 	r.tail = r.wrapIndex(r.tail + 1)
 
-	log.Println(r.buffer)
 	return nil
 }
 
@@ -50,6 +48,5 @@ func (r *RingBuffer[T]) Pop() (T, error) {
 	value := r.buffer[r.head]
 	r.head = r.wrapIndex(r.head + 1)
 
-	log.Println(r.buffer)
 	return value, nil
 }
