@@ -8,8 +8,9 @@ import (
 type cellState uint8
 
 const (
-	free   cellState = 0
-	filled cellState = 1
+	emptyCell cellState = 0
+	snakeCell cellState = 1
+	foodCell  cellState = 2
 )
 
 const (
@@ -21,12 +22,9 @@ const (
 var headStart = vector{gridWidth / 2, gridHeight / 2}
 
 var cellChars = map[cellState]string{
-	free:   "  ",
-	filled: "[]",
+	emptyCell: "  ",
+	snakeCell: "[]",
 }
-
-// var freeCells = make(map[vector]struct{})
-// var filledCells = make(map[vector]struct{})
 
 const tickRate time.Duration = time.Second / 4
 
@@ -35,50 +33,39 @@ type vector struct {
 	y int
 }
 
+func vectorAdd(a vector, b vector) vector {
+	return vector{a.x + b.x, a.y + b.y}
+}
+
+func vectorEquals(a vector, b vector) bool {
+	return (a.x == b.x) && (a.y == b.y)
+}
+
 type model struct {
-	grid      [gridWidth * gridHeight]int
-	snake     ring_array.RingArray[vector]
-	direction vector
+	snake       ring_array.RingArray[vector]
+	direction   vector
+	inputBuffer ring_array.RingArray[vector]
 }
 
 func (m *model) grow() {
 	tail := m.snake.Tail()
 	m.snake.PushBack(tail)
-	m.grid[gridIndex(tail)]++
 }
 
 func tickUpdate(m model) model {
-	newHead := vector{
-		m.snake.Head().x + m.direction.x,
-		m.snake.Head().y + m.direction.y,
+	input, err := m.inputBuffer.PopBack()
+	if err == nil {
+		m.direction = input
 	}
 
-	m.snake.PushFront(newHead)
-	m.grid[gridIndex(newHead)]++
+	newHead := vectorAdd(m.snake.Head(), m.direction)
 
-	tail, _ := m.snake.PopBack()
-	m.grid[gridIndex(tail)]--
+	m.snake.PushFront(newHead)
+	m.snake.PopBack()
 
 	return m
 }
 
 func gridIndex(vector vector) int {
 	return vector.y*gridWidth + vector.x
-}
-
-func gridString(m model) string {
-	var s string
-	for y := gridHeight - 1; y >= 0; y-- {
-		for x := 0; x < gridWidth; x++ {
-			snakeNodes := m.grid[gridIndex(vector{x, y})]
-			if snakeNodes == 0 {
-				s += cellChars[free]
-			}
-			if snakeNodes > 0 {
-				s += cellChars[filled]
-			}
-		}
-		s += "\n"
-	}
-	return s
 }
