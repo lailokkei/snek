@@ -37,6 +37,29 @@ func (r *RingArray[T]) Tail() T {
 	return r.array[r.tail]
 }
 
+func (r *RingArray[T]) Array() []T {
+	array := make([]T, r.Length)
+	idx := 0
+	if r.head < r.tail {
+		for i := r.tail; i < r.size; i++ {
+			array[idx] = r.array[i]
+			idx++
+		}
+		for i := 0; i < r.head+1; i++ {
+			array[idx] = r.array[i]
+			idx++
+		}
+		return array
+	}
+
+	for i := r.tail; i < r.head+1; i++ {
+		array[idx] = r.array[i]
+		idx++
+	}
+
+	return array
+}
+
 func (r *RingArray[T]) PushFront(value T) error {
 	if r.Length >= r.size {
 		return errors.New("Buffer is full.")

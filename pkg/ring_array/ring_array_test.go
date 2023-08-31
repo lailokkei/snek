@@ -60,3 +60,34 @@ func TestDirections(t *testing.T) {
 	got, _ = r.PopFront()
 	expect(t, 2, got)
 }
+
+func TestArray(t *testing.T) {
+	r := ring_array.NewRingArray[int](5)
+	r.PushFront(5)
+	r.PushFront(59)
+	r.PushFront(612)
+
+	var got []int
+	got = r.Array()
+
+	actual := []int{5, 59, 612}
+	for i := range actual {
+		expect(t, actual[i], got[i])
+	}
+
+	r.PopBack()
+	r.PopBack()
+	r.PopBack()
+
+	r.PushFront(867)
+	r.PushFront(23)
+	r.PushFront(632)
+	r.PushFront(354)
+
+	got = r.Array()
+
+	actual = []int{867, 23, 632, 354}
+	for i := range actual {
+		expect(t, actual[i], got[i])
+	}
+}
