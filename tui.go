@@ -1,16 +1,24 @@
 package main
 
 import (
+	"snek/pkg/ring_array"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 func initialModel() model {
-	return model{
-		head:      vector{gridWidth / 2, gridHeight / 2},
+	m := model{
+		snake:     ring_array.NewRingArray[vector](gridSize),
 		direction: vector{0, 1},
 	}
+	m.snake.PushFront(headStart)
+	m.grid[gridIndex(headStart)]++
+
+	for i := 0; i < 5; i++ {
+		m.grow()
+	}
+	return m
 }
 
 func tick() tea.Msg {
@@ -22,6 +30,10 @@ type tickMsg time.Time
 
 func (m model) Init() tea.Cmd {
 	return tick
+}
+
+func handleInput() {
+
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {

@@ -1,6 +1,9 @@
 package main
 
-import "time"
+import (
+	"snek/pkg/ring_array"
+	"time"
+)
 
 type cellState uint8
 
@@ -10,17 +13,20 @@ const (
 )
 
 const (
-	gridWidth  int = 40
-	gridHeight int = 30
+	gridWidth  int = 20
+	gridHeight int = 15
+	gridSize       = gridWidth * gridHeight
 )
+
+var headStart = vector{gridWidth / 2, gridHeight / 2}
 
 var cellChars = map[cellState]string{
 	free:   "  ",
 	filled: "[]",
 }
 
-var freeCells = make(map[vector]struct{})
-var filledCells = make(map[vector]struct{})
+// var freeCells = make(map[vector]struct{})
+// var filledCells = make(map[vector]struct{})
 
 const tickRate time.Duration = time.Second / 4
 
@@ -30,17 +36,28 @@ type vector struct {
 }
 
 type model struct {
-	grid [gridWidth * gridHeight]cellState
-
-	head      vector
+	grid      [gridWidth * gridHeight]int
+	snake     ring_array.RingArray[vector]
 	direction vector
 }
 
-func tickUpdate(m model) model {
-	m.head.x += m.direction.x
-	m.head.y += m.direction.y
+func (m *model) grow() {
+	tail := m.snake.Tail()
+	m.snake.PushBack(tail)
+	m.grid[gridIndex(tail)]++
+}
 
-	m.grid[gridIndex(m.head)] = filled
+func tickUpdate(m model) model {
+	newHead := vector{
+		m.snake.Head().x + m.direction.x,
+		m.snake.Head().y + m.direction.y,
+	}
+
+	m.snake.PushFront(newHead)
+	m.grid[gridIndex(newHead)]++
+
+	tail, _ := m.snake.PopBack()
+	m.grid[gridIndex(tail)]--
 
 	return m
 }
@@ -53,7 +70,13 @@ func gridString(m model) string {
 	var s string
 	for y := gridHeight - 1; y >= 0; y-- {
 		for x := 0; x < gridWidth; x++ {
-			s += cellChars[m.grid[gridIndex(vector{x, y})]]
+			snakeNodes := m.grid[gridIndex(vector{x, y})]
+			if snakeNodes == 0 {
+				s += cellChars[free]
+			}
+			if snakeNodes > 0 {
+				s += cellChars[filled]
+			}
 		}
 		s += "\n"
 	}
