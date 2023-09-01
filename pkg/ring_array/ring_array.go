@@ -29,12 +29,20 @@ func (r RingArray[T]) wrapIndex(i int) int {
 	return i % r.size
 }
 
-func (r *RingArray[T]) Head() T {
-	return r.array[r.head]
+func (r *RingArray[T]) Head() (T, error) {
+	if r.Length <= 0 {
+		var head T
+		return head, errors.New("no elements")
+	}
+	return r.array[r.head], nil
 }
 
-func (r *RingArray[T]) Tail() T {
-	return r.array[r.tail]
+func (r *RingArray[T]) Tail() (T, error) {
+	if r.Length <= 0 {
+		var tail T
+		return tail, errors.New("no elements")
+	}
+	return r.array[r.tail], nil
 }
 
 func (r *RingArray[T]) Array() []T {
