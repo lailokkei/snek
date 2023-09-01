@@ -17,6 +17,7 @@ const (
 	gridWidth  int = 20
 	gridHeight int = 15
 	gridSize       = gridWidth * gridHeight
+	initSize   int = 5
 )
 
 var headStart = vector{gridWidth / 2, gridHeight / 2}
@@ -42,28 +43,45 @@ func vectorEquals(a vector, b vector) bool {
 }
 
 type model struct {
+	currentView view
+
 	snake       ring_array.RingArray[vector]
 	direction   vector
 	inputBuffer ring_array.RingArray[vector]
 }
 
 func (m *model) grow() {
-	tail := m.snake.Tail()
+	tail, _ := m.snake.Tail()
 	m.snake.PushBack(tail)
 }
 
-func tickUpdate(m model) model {
+func outOfBounds(position vector) bool {
+	if position.x > gridWidth-1 || position.x < 0 {
+		return true
+	}
+	if position.y > gridHeight-1 || position.y < 0 {
+		return true
+	}
+	return false
+}
+
+func tickUpdate(m model) (model, bool) {
 	input, err := m.inputBuffer.PopBack()
 	if err == nil {
 		m.direction = input
 	}
+	head, _ := m.snake.Head()
+	newHead := vectorAdd(head, m.direction)
 
-	newHead := vectorAdd(m.snake.Head(), m.direction)
+	if outOfBounds(newHead) {
+		m.currentView = gameOver
+		return m, true
+	}
 
 	m.snake.PushFront(newHead)
 	m.snake.PopBack()
 
-	return m
+	return m, false
 }
 
 func gridIndex(vector vector) int {
