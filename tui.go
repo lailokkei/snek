@@ -16,6 +16,16 @@ const (
 
 type view int
 
+var cellChars = map[cellState]string{
+	emptyCell: "  ",
+	snakeCell: "[]",
+	foodCell:  "<>",
+}
+
+const tickRate time.Duration = time.Second / 5
+
+var headStart = vector{gridWidth / 2, gridHeight / 2}
+
 func initialModel() model {
 	m := model{
 		currentView: ingame,

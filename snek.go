@@ -3,7 +3,6 @@ package main
 import (
 	"math/rand"
 	"snek/pkg/ring_array"
-	"time"
 )
 
 type cellState uint8
@@ -15,21 +14,11 @@ const (
 )
 
 const (
-	gridWidth  int = 10
-	gridHeight int = 8
+	gridWidth  int = 12
+	gridHeight int = 9
 	gridSize       = gridWidth * gridHeight
 	initSize   int = 5
 )
-
-var headStart = vector{gridWidth / 2, gridHeight / 2}
-
-var cellChars = map[cellState]string{
-	emptyCell: "  ",
-	snakeCell: "[]",
-	foodCell:  "<>",
-}
-
-const tickRate time.Duration = time.Second / 4
 
 type vector struct {
 	x int
