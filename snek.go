@@ -79,21 +79,26 @@ func collision(snake ring_array.RingArray[vector]) bool {
 	return false
 }
 
-func randomEmpty(snake ring_array.RingArray[vector]) vector {
+func randomEmpty(m model) vector {
+	grid := stateGrid(m)
 	var empty vector
 	found := false
-
 	for found == false {
 		empty = vector{rand.Intn(gridWidth), rand.Intn(gridHeight)}
-		found = true
-		for _, cell := range snake.Array() {
-			if vectorEquals(cell, empty) {
-				found = false
-				break
-			}
+		if grid[gridIndex(empty)] == emptyCell {
+			found = true
 		}
 	}
 	return empty
+}
+
+func stateGrid(m model) []cellState {
+	grid := make([]cellState, gridSize)
+	for _, snakeNode := range m.snake.Array() {
+		grid[gridIndex(snakeNode)] = snakeCell
+	}
+	grid[gridIndex(m.food)] = foodCell
+	return grid
 }
 
 func tickUpdate(m model) (model, bool) {

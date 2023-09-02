@@ -8,9 +8,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type currentView struct {
-}
-
 const (
 	ingame   view = 0
 	gameOver view = 1
@@ -32,7 +29,7 @@ func initialModel() model {
 		m.grow()
 	}
 
-	m.food = randomEmpty(m.snake)
+	m.food = randomEmpty(m)
 
 	return m
 }
@@ -101,7 +98,7 @@ func (m model) View() string {
 	case gameOver:
 		s = gameOverView(m)
 	}
-	// s += fmt.Sprintf("%v\n", m.snake.Length)
+
 	return s
 }
 
@@ -113,14 +110,8 @@ func gameOverView(m model) string {
 }
 
 func inGameView(m model) string {
-	grid := make([]cellState, gridSize)
+	grid := stateGrid(m)
 	var s string
-	for _, snakeNode := range m.snake.Array() {
-		grid[gridIndex(snakeNode)] = snakeCell
-	}
-
-	grid[gridIndex(m.food)] = foodCell
-
 	caps := "--"
 	for i := 0; i < gridWidth; i++ {
 		caps += "--"
