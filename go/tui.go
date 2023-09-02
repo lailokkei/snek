@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"snek/pkg/ring_array"
+	"snek/go/pkg/ring_array"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
