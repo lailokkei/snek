@@ -15,8 +15,8 @@ const (
 )
 
 const (
-	gridWidth  int = 20
-	gridHeight int = 15
+	gridWidth  int = 10
+	gridHeight int = 8
 	gridSize       = gridWidth * gridHeight
 	initSize   int = 5
 )
@@ -26,7 +26,7 @@ var headStart = vector{gridWidth / 2, gridHeight / 2}
 var cellChars = map[cellState]string{
 	emptyCell: "  ",
 	snakeCell: "[]",
-	foodCell:  "XX",
+	foodCell:  "<>",
 }
 
 const tickRate time.Duration = time.Second / 4
@@ -85,11 +85,12 @@ func randomEmpty(snake ring_array.RingArray[vector]) vector {
 
 	for found == false {
 		empty = vector{rand.Intn(gridWidth), rand.Intn(gridHeight)}
+		found = true
 		for _, cell := range snake.Array() {
 			if vectorEquals(cell, empty) {
-				continue
+				found = false
+				break
 			}
-			found = true
 		}
 	}
 	return empty
