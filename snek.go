@@ -114,7 +114,7 @@ func tickUpdate(m model) (model, bool) {
 
 	if vectorEquals(newHead, m.food) {
 		m.grow()
-		m.food = randomEmpty(m.snake)
+		m.food = randomEmpty(m)
 	}
 
 	return m, false
