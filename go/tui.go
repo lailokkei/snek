@@ -95,6 +95,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if !died {
 			return m, tick
 		}
+		return m, tea.Quit
 	}
 
 	return m, nil
@@ -114,8 +115,7 @@ func (m model) View() string {
 
 func gameOverView(m model) string {
 	var s string
-	s += "Game Over!\n"
-	s += fmt.Sprintf("Your length : %d\n", m.snake.Length)
+	s += fmt.Sprintf("Game Over! Your length : %d\n", m.snake.Length)
 	return s
 }
 
