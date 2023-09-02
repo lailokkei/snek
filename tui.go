@@ -22,7 +22,7 @@ var cellChars = map[cellState]string{
 	foodCell:  "<>",
 }
 
-const tickRate time.Duration = time.Second / 5
+const tickRate time.Duration = time.Second / 6
 
 var headStart = vector{gridWidth / 2, gridHeight / 2}
 
