@@ -31,6 +31,9 @@ func initialModel() model {
 	for i := 0; i < initSize-1; i++ {
 		m.grow()
 	}
+
+	m.food = randomEmpty(m.snake)
+
 	return m
 }
 
@@ -111,6 +114,8 @@ func inGameView(m model) string {
 	for _, snakeNode := range m.snake.Array() {
 		grid[gridIndex(snakeNode)] = snakeCell
 	}
+
+	grid[gridIndex(m.food)] = foodCell
 
 	caps := "--"
 	for i := 0; i < gridWidth; i++ {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math/rand"
 	"snek/pkg/ring_array"
 	"time"
 )
@@ -25,6 +26,7 @@ var headStart = vector{gridWidth / 2, gridHeight / 2}
 var cellChars = map[cellState]string{
 	emptyCell: "  ",
 	snakeCell: "[]",
+	foodCell:  "XX",
 }
 
 const tickRate time.Duration = time.Second / 4
@@ -44,6 +46,8 @@ func vectorEquals(a vector, b vector) bool {
 
 type model struct {
 	currentView view
+
+	food vector
 
 	snake       ring_array.RingArray[vector]
 	direction   vector
@@ -65,6 +69,32 @@ func outOfBounds(position vector) bool {
 	return false
 }
 
+func collision(snake ring_array.RingArray[vector]) bool {
+	cells := snake.Array()
+	for i := len(cells) - 2; i >= 0; i-- {
+		if vectorEquals(cells[len(cells)-1], cells[i]) {
+			return true
+		}
+	}
+	return false
+}
+
+func randomEmpty(snake ring_array.RingArray[vector]) vector {
+	var empty vector
+	found := false
+
+	for found == false {
+		empty = vector{rand.Intn(gridWidth), rand.Intn(gridHeight)}
+		for _, cell := range snake.Array() {
+			if vectorEquals(cell, empty) {
+				continue
+			}
+			found = true
+		}
+	}
+	return empty
+}
+
 func tickUpdate(m model) (model, bool) {
 	input, err := m.inputBuffer.PopBack()
 	if err == nil {
@@ -73,13 +103,18 @@ func tickUpdate(m model) (model, bool) {
 	head, _ := m.snake.Head()
 	newHead := vectorAdd(head, m.direction)
 
-	if outOfBounds(newHead) {
+	m.snake.PushFront(newHead)
+	m.snake.PopBack()
+
+	if outOfBounds(newHead) || collision(m.snake) {
 		m.currentView = gameOver
 		return m, true
 	}
 
-	m.snake.PushFront(newHead)
-	m.snake.PopBack()
+	if vectorEquals(newHead, m.food) {
+		m.grow()
+		m.food = randomEmpty(m.snake)
+	}
 
 	return m, false
 }
