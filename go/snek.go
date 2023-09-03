@@ -2,7 +2,7 @@ package main
 
 import (
 	"math/rand"
-	"snek/go/pkg/ring_array"
+	"snek/pkg/ring_array"
 )
 
 type cellState uint8
